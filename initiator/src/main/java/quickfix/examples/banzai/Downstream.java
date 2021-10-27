@@ -111,9 +111,9 @@ public class Downstream {
             log.info(e.getMessage(), e);
         }finally{
 //            testMarketDataRequest();
-            testNewOrderSingle();
+//            testNewOrderSingle();
 //            for(int i=0;i<10;i++){
-//                testQuoteRequest();
+                testQuoteRequest();
 //            }
 //            testQuoteCancel();
         }
@@ -125,8 +125,8 @@ public class Downstream {
         newOrderSingle.setField(new PartyID("EFX_TRADE"));
         newOrderSingle.setField(new QuoteID("QuoteID_56ed394f-314c-4755-8a40-716e8e304113"));
         newOrderSingle.setField(new ClOrdID("ClOrdID_"+UUID.randomUUID().toString()));
-        newOrderSingle.setField(new Account("usrid1004"));
-        newOrderSingle.setField(new QuoteRespID("20304"));
+        newOrderSingle.setField(new Account("usrid1002"));
+        newOrderSingle.setField(new QuoteRespID("20346"));
         newOrderSingle.setField(new QuoteMsgID("GenIdeal"));
         newOrderSingle.setField(new Side('1'));//1-b,2-s
         newOrderSingle.setField(new TradeDate(new SimpleDateFormat("yyyyMMdd").format(new Date())));
@@ -138,9 +138,8 @@ public class Downstream {
         qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
         qr.setField(new PartyID("EFX_TRADE"));
         qr.setField(new Symbol("USDCNY"));
-//        qr.setField(new Side('1'));//1-b,2-s,7-not tell
-        qr.setField(new Side('7'));
-        qr.setField(new QuoteType(0));
+        qr.setField(new Side('1'));//1-b,2-s,7-not tell
+        qr.setField(new QuoteType(3));//1.rfq,2.rfs,3.oneClick
         qr.setField(new OrdType('2'));
         qr.setField(new OptPayAmount(Double.valueOf("1000")));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
