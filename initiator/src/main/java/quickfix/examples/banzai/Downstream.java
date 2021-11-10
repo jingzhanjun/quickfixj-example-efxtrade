@@ -110,14 +110,20 @@ public class Downstream {
         } catch (Exception e) {
             log.info(e.getMessage(), e);
         }finally{
-//            testMarketDataRequest();
+            String symbols="AUDCAD,AUDCHF,AUDHKD,AUDJPY,AUDNZD,AUDUSD,CADCHF,CADHKD,CADJPY,CHFHKD,CHFJPY,EURAUD,EURCAD,EURCHF,EURGBP,EURHKD,EURJPY,EURNZD,EURUSD,GBPAUD,GBPCAD,GBPCHF,GBPHKD,GBPJPY,GBPNZD,GBPUSD,HKDCNH,HKDJPY,NZDCAD,NZDCHF,NZDHKD,NZDJPY,NZDUSD,USDCAD,USDCHF,USDCNH,USDHKD,USDJPY,XAUUSD";
+//            String[] ss=symbols.split("[,]");
+//            for(int i=0;i<1;i++){
+//                for(int o=0;o<1;o++){
+//                    String symbol=ss[o];
+////            testMarketDataRequest();
 //            testNewOrderSingle();
-//                testQuoteRequest();
-            for(int i=0;i<1000;i++){
-                testQuoteRequest(i);
-                Thread.sleep(1000);
-            }
+                testQuoteRequest();
+//                    testQuoteRequest(o,symbol);
+//                    Thread.sleep(1000);
+////                    Thread.sleep(10000);
+//                }
 //            testQuoteCancel();
+//            }
         }
         shutdownLatch.await();
     }
@@ -125,13 +131,15 @@ public class Downstream {
     private static void testNewOrderSingle() throws SessionNotFound {
         NewOrderSingle newOrderSingle = new NewOrderSingle();
         newOrderSingle.setField(new PartyID("EFX_TRADE"));
+        newOrderSingle.setField(new QuoteReqID("QuoteRequestID_be5548ba-b16d-4674-a718-366de4cbc342"));
         newOrderSingle.setField(new QuoteID("QuoteID_bd4d108f-d353-464e-add2-633e755bfe71"));
         newOrderSingle.setField(new ClOrdID("ClOrdID_"+UUID.randomUUID().toString()));
-        newOrderSingle.setField(new Account("usrid1000"));
-        newOrderSingle.setField(new QuoteRespID("21063"));
+        newOrderSingle.setField(new Account("4"));
+        newOrderSingle.setField(new Spread(Double.valueOf("10")));//markup
+        newOrderSingle.setField(new QuoteRespID("22182"));
         newOrderSingle.setField(new QuoteMsgID("GenIdeal"));
         newOrderSingle.setField(new QuoteType(1));//1.rfq,2.rfs,3.oneClick
-        newOrderSingle.setField(new Side('1'));//1-b,2-s
+        newOrderSingle.setField(new Side('2'));//1-b,2-s
         newOrderSingle.setField(new TradeDate(new SimpleDateFormat("yyyyMMdd").format(new Date())));
         Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
     }
@@ -141,14 +149,14 @@ public class Downstream {
         qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
         qr.setField(new PartyID("EFX_TRADE"));
         qr.setField(new Symbol("EURUSD"));
-        qr.setField(new Side('2'));//1-b,2-s,7-not tell
+        qr.setField(new Side('7'));//1-b,2-s,7-not tell
         qr.setField(new QuoteType(1));//1.rfq,2.rfs,3.oneClick
         qr.setField(new OrdType('2'));
         qr.setField(new OptPayAmount(Double.valueOf("1000")));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
         Session.sendToTarget(qr,initiator.getSessions().get(0));
     }
-    private static void testQuoteRequest(int i) throws SessionNotFound{
+    private static void testQuoteRequest(int i, String symbol) throws SessionNotFound{
         int a=i%2;
         char side='0';
         if(a==1){
@@ -160,9 +168,9 @@ public class Downstream {
         QuoteRequest qr=new QuoteRequest();
         qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
         qr.setField(new PartyID("EFX_TRADE"));
-        qr.setField(new Symbol("EURUSD"));
+        qr.setField(new Symbol(symbol));
         qr.setField(new Side(side));//1-b,2-s,7-not tell
-        qr.setField(new QuoteType(2));//1.rfq,2.rfs,3.oneClick
+        qr.setField(new QuoteType(1));//1.rfq,2.rfs,3.oneClick
         qr.setField(new OrdType('2'));
         qr.setField(new OptPayAmount(Double.valueOf("1000")));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
