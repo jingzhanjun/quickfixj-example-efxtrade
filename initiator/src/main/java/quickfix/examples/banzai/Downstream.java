@@ -19,6 +19,7 @@
 
 package quickfix.examples.banzai;
 
+import com.pactera.fix.custom.*;
 import org.quickfixj.jmx.JmxExporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,22 +135,24 @@ public class Downstream {
         newOrderSingle.setField(new QuoteReqID("QuoteRequestID_be5548ba-b16d-4674-a718-366de4cbc342"));
         newOrderSingle.setField(new QuoteID("QuoteID_bd4d108f-d353-464e-add2-633e755bfe71"));
         newOrderSingle.setField(new ClOrdID("ClOrdID_"+UUID.randomUUID().toString()));
-        newOrderSingle.setField(new QuoteType(2));//1.rfq,2.rfs,3-oneClick
-        newOrderSingle.setField(new Side('2'));//1-b,2-s
-        newOrderSingle.setField(new Account("1022"));
-        newOrderSingle.setField(new Issuer("1022"));
-        newOrderSingle.setField(new QuoteRespID("22332"));
+        newOrderSingle.setField(new Side('1'));//1-b,2-s
+        newOrderSingle.setField(new Account("client1@trapi"));
+        newOrderSingle.setField(new Issuer("1033"));
+        newOrderSingle.setField(new QuoteRespID("22430"));
         newOrderSingle.setField(new QuoteMsgID("GenIdeal"));
         newOrderSingle.setField(new Spread(Double.valueOf("10")));//markup
         newOrderSingle.setField(new TradeDate(new SimpleDateFormat("yyyyMMdd").format(new Date())));
         //added=====================================
-        newOrderSingle.setField(new Symbol("EURUSD"));
-        newOrderSingle.setField(new Price(Double.valueOf("10")));//taker price
-        newOrderSingle.setField(new CFICode("5M"));//SPOT,2D,1M...
-//        newOrderSingle.setField(new PositionLimit(Integer.valueOf(DPS)));
-//        newOrderSingle.setField(new ExecInst(Integer.valueOf(DPS)));//one click type
-//        newOrderSingle.setField(new MaxFloor(Integer.valueOf(DPS)));//The acceptable amount that the executed rate can deviate from the rate submitted by the price taker
-//        newOrderSingle.setField(new Price2(Double.valueOf(DPS)));//Value from the streaming price in 35=X or 35=W
+        newOrderSingle.setField(new Symbol("EUR.USD"));
+        newOrderSingle.setField(new OrderQty(Double.valueOf("5000")));
+        newOrderSingle.setField(new SettlType("0"));//0-SPOT,1-2D
+        newOrderSingle.setField(new ExecutionStyle(2));//1-rfq,2-rfs,3-one click
+        //one click fixed==================================
+        newOrderSingle.setField(new DPS(4));
+        newOrderSingle.setField(new Price(Double.valueOf("1.12397")));
+        newOrderSingle.setField(new OneClickTolerance(0.0005));
+        newOrderSingle.setField(new OneClickAction(2));//1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE
+        newOrderSingle.setField(new StreamingQuote(1.12515));
 
         Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
     }
@@ -158,13 +161,13 @@ public class Downstream {
         QuoteRequest qr=new QuoteRequest();
         qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
         qr.setField(new PartyID("EFX_TRADE"));
-        qr.setField(new Symbol("EURUSD"));
+        qr.setField(new Symbol("EUR.USD"));
         qr.setField(new Side('7'));//1-b,2-s,7-not tell
-        qr.setField(new QuoteType(1));//1.rfq,2.rfs
+        qr.setField(new ExecutionStyle(2));//1.rfq,2.rfs
         qr.setField(new OrdType('1'));//1-Market,2-Limit
-        qr.setField(new CFICode("5M"));//SPOT,2D,1M...
-//        qr.setField(new Account("5M"));
-        qr.setField(new OptPayAmount(Double.valueOf("5000")));
+        qr.setField(new SettlType("0"));//0-SPOT,1-2D
+//        qr.setField(new Account("0"));//0-SPOT,1-2D
+        qr.setField(new OrderQty(Double.valueOf("5000")));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
         Session.sendToTarget(qr,initiator.getSessions().get(0));
     }

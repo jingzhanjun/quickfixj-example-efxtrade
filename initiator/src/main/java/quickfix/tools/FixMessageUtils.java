@@ -310,7 +310,7 @@ public class FixMessageUtils {
                 case UTCTIMEONLY:
                     return safeGetField(group, new UtcTimeOnlyField(tag)).map(d -> d);
                 default:
-                    throw new IllegalArgumentException("Cannot of field from type: " + fieldType);
+                    throw new IllegalArgumentException("Cannot of quickfix.field from type: " + fieldType);
             }
         } else {
             return safeGetField(group, new StringField(tag)).map(d -> d);
@@ -343,7 +343,7 @@ public class FixMessageUtils {
                 case UTCTIMEONLY:
                     group.setField(utcTimeOnlyField(tag, value));
                 default:
-                    throw new IllegalArgumentException("Cannot of field from type: " + fieldType);
+                    throw new IllegalArgumentException("Cannot of quickfix.field from type: " + fieldType);
             }
         } else {
             String v = Objects.nonNull(value) ? value.toString() : "";

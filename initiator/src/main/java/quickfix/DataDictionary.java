@@ -239,10 +239,10 @@ public class DataDictionary {
     }
 
     /**
-     * Get the field name for a specified tag.
+     * Get the quickfix.field name for a specified tag.
      *
      * @param field the tag
-     * @return the field name
+     * @return the quickfix.field name
      */
     public String getFieldName(int field) {
         return fieldNames.get(field);
@@ -253,7 +253,7 @@ public class DataDictionary {
     }
 
     /**
-     * Get the value name, if any, for an enumerated field value.
+     * Get the value name, if any, for an enumerated quickfix.field value.
      *
      * @param field the tag
      * @param value the value
@@ -275,20 +275,20 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a tag is a defined field.
+     * Predicate for determining if a tag is a defined quickfix.field.
      *
      * @param field the tag
-     * @return true if the field is defined, false otherwise
+     * @return true if the quickfix.field is defined, false otherwise
      */
     public boolean isField(int field) {
         return fields.contains(field);
     }
 
     /**
-     * Return the field type for a field.
+     * Return the quickfix.field type for a quickfix.field.
      *
      * @param field the tag
-     * @return the field type
+     * @return the quickfix.field type
      */
     public FieldType getFieldType(int field) {
         return fieldTypes.get(field);
@@ -351,11 +351,11 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field is valid for a given message type.
+     * Predicate for determining if a quickfix.field is valid for a given message type.
      *
      * @param msgType the message type
      * @param field the tag
-     * @return true if field is defined for message, false otherwise.
+     * @return true if quickfix.field is defined for message, false otherwise.
      */
     public boolean isMsgField(String msgType, int field) {
         final Set<Integer> fields = messageFields.get(msgType);
@@ -363,20 +363,20 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if field is a header field.
+     * Predicate for determining if quickfix.field is a header quickfix.field.
      *
      * @param field the tag
-     * @return true if field is a header field, false otherwise.
+     * @return true if quickfix.field is a header quickfix.field, false otherwise.
      */
     public boolean isHeaderField(int field) {
         return isMsgField(HEADER_ID, field);
     }
 
     /**
-     * Predicate for determining if field is a trailer field.
+     * Predicate for determining if quickfix.field is a trailer quickfix.field.
      *
      * @param field the tag
-     * @return true if field is a trailer field, false otherwise.
+     * @return true if quickfix.field is a trailer quickfix.field, false otherwise.
      */
     public boolean isTrailerField(int field) {
         return isMsgField(TRAILER_ID, field);
@@ -387,9 +387,9 @@ public class DataDictionary {
     }
 
     /**
-     * Get the field tag given a field name.
+     * Get the quickfix.field tag given a quickfix.field name.
      *
-     * @param name the field name
+     * @param name the quickfix.field name
      * @return the tag
      */
     public int getFieldTag(String name) {
@@ -402,11 +402,11 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field is required for a message type
+     * Predicate for determining if a quickfix.field is required for a message type
      *
      * @param msgType the message type
      * @param field the tag
-     * @return true if field is required, false otherwise
+     * @return true if quickfix.field is required, false otherwise
      */
     public boolean isRequiredField(String msgType, int field) {
         final Set<Integer> fields = requiredFields.get(msgType);
@@ -414,20 +414,20 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a header field is a required field
+     * Predicate for determining if a header quickfix.field is a required quickfix.field
      *
      * @param field the tag
-     * @return true if field s required, false otherwise
+     * @return true if quickfix.field s required, false otherwise
      */
     public boolean isRequiredHeaderField(int field) {
         return isRequiredField(HEADER_ID, field);
     }
 
     /**
-     * Predicate for determining if a trailer field is a required field
+     * Predicate for determining if a trailer quickfix.field is a required quickfix.field
      *
      * @param field the tag
-     * @return true if field s required, false otherwise
+     * @return true if quickfix.field s required, false otherwise
      */
     public boolean isRequiredTrailerField(int field) {
         return isRequiredField(TRAILER_ID, field);
@@ -438,10 +438,10 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field has enumerated values.
+     * Predicate for determining if a quickfix.field has enumerated values.
      *
      * @param field the tag
-     * @return true if field is enumerated, false otherwise
+     * @return true if quickfix.field is enumerated, false otherwise
      */
     public boolean hasFieldValue(int field) {
         final Set<String> values = fieldValues.get(field);
@@ -449,11 +449,11 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field value is valid
+     * Predicate for determining if a quickfix.field value is valid
      *
      * @param field the tag
-     * @param value a possible field value
-     * @return true if field value is valid, false otherwise
+     * @param value a possible quickfix.field value
+     * @return true if quickfix.field value is valid, false otherwise
      */
     public boolean isFieldValue(int field, String value) {
         final Set<String> validValues = fieldValues.get(field);
@@ -485,22 +485,22 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field is a group count field for a message
+     * Predicate for determining if a quickfix.field is a group count quickfix.field for a message
      * type.
      *
      * @param msg the message type
      * @param field the tag
-     * @return true if field starts a repeating group, false otherwise
+     * @return true if quickfix.field starts a repeating group, false otherwise
      */
     public boolean isGroup(String msg, int field) {
         return groups.contains(msg, field);
     }
 
     /**
-     * Predicate for determining if a field is a header group count field
+     * Predicate for determining if a quickfix.field is a header group count quickfix.field
      *
      * @param field the tag
-     * @return true if field starts a repeating group, false otherwise
+     * @return true if quickfix.field starts a repeating group, false otherwise
      */
     public boolean isHeaderGroup(int field) {
         return groups.contains(HEADER_ID, field);
@@ -518,10 +518,10 @@ public class DataDictionary {
     }
 
     /**
-     * Predicate for determining if a field is a FIX raw data field.
+     * Predicate for determining if a quickfix.field is a FIX raw data quickfix.field.
      *
      * @param field the tag
-     * @return true if field is a raw data field, false otherwise
+     * @return true if quickfix.field is a raw data quickfix.field, false otherwise
      */
     public boolean isDataField(int field) {
         return fieldTypes.get(field) == FieldType.DATA;
@@ -577,7 +577,7 @@ public class DataDictionary {
     }
 
     /**
-     * Controls whether empty field values are checked.
+     * Controls whether empty quickfix.field values are checked.
      *
      * @param flag true = checked, false = not checked
      */
@@ -689,9 +689,9 @@ public class DataDictionary {
      * Validate a message, including the header and trailer fields.
      *
      * @param message the message
-     * @throws IncorrectTagValue if a field value is not valid
-     * @throws FieldNotFound if a field cannot be found
-     * @throws IncorrectDataFormat if a field value has a wrong data type
+     * @throws IncorrectTagValue if a quickfix.field value is not valid
+     * @throws FieldNotFound if a quickfix.field cannot be found
+     * @throws IncorrectDataFormat if a quickfix.field value has a wrong data type
      */
     public void validate(Message message) throws IncorrectTagValue, FieldNotFound,
             IncorrectDataFormat {
@@ -703,9 +703,9 @@ public class DataDictionary {
      *
      * @param message the message
      * @param bodyOnly whether to validate just the message body, or to validate the header and trailer sections as well.
-     * @throws IncorrectTagValue if a field value is not valid
-     * @throws FieldNotFound if a field cannot be found
-     * @throws IncorrectDataFormat if a field value has a wrong data type
+     * @throws IncorrectTagValue if a quickfix.field value is not valid
+     * @throws FieldNotFound if a quickfix.field cannot be found
+     * @throws IncorrectDataFormat if a quickfix.field value has a wrong data type
      */
     public void validate(Message message, boolean bodyOnly) throws IncorrectTagValue,
             FieldNotFound, IncorrectDataFormat {
@@ -783,14 +783,14 @@ public class DataDictionary {
         }
     }
 
-    /** Check if field tag number is defined in spec. **/
+    /** Check if quickfix.field tag number is defined in spec. **/
     void checkValidTagNumber(Field<?> field) {
         if (!fields.contains(field.getTag())) {
             throw new FieldException(SessionRejectReason.INVALID_TAG_NUMBER, field.getField());
         }
     }
 
-    /** Check if field tag is defined for message or group **/
+    /** Check if quickfix.field tag is defined for message or group **/
     void checkField(Field<?> field, String msgType, boolean message) {
         // use different validation for groups and messages
         boolean messageField = message ? isMsgField(msgType, field.getField()) : fields.contains(field.getField());
@@ -887,7 +887,7 @@ public class DataDictionary {
         }
     }
 
-    /** Check if a field has a value. **/
+    /** Check if a quickfix.field has a value. **/
     private void checkHasValue(StringField field) {
         if (checkFieldsHaveValues && field.getValue().length() == 0) {
             throw new FieldException(SessionRejectReason.TAG_SPECIFIED_WITHOUT_A_VALUE,
@@ -1056,19 +1056,19 @@ public class DataDictionary {
             if (fieldNode.getNodeName().equals("field")) {
                 final String name = getAttribute(fieldNode, "name");
                 if (name == null) {
-                    throw new ConfigError("<field> does not have a name attribute");
+                    throw new ConfigError("<quickfix.field> does not have a name attribute");
                 }
 
                 final String number = getAttribute(fieldNode, "number");
                 if (number == null) {
-                    throw new ConfigError("<field> " + name + " does not have a number attribute");
+                    throw new ConfigError("<quickfix.field> " + name + " does not have a number attribute");
                 }
 
                 final int num = Integer.parseInt(number);
 
                 final String type = getAttribute(fieldNode, "type");
                 if (type == null) {
-                    throw new ConfigError("<field> " + name + " does not have a type attribute");
+                    throw new ConfigError("<quickfix.field> " + name + " does not have a type attribute");
                 }
 
                 addField(num);
@@ -1081,7 +1081,7 @@ public class DataDictionary {
                     if (valueNode.getNodeName().equals("value")) {
                         final String enumeration = getAttribute(valueNode, "enum");
                         if (enumeration == null) {
-                            throw new ConfigError("<value> does not have enum attribute in field "
+                            throw new ConfigError("<value> does not have enum attribute in quickfix.field "
                                     + name);
                         }
                         addFieldValue(num, enumeration);
@@ -1183,7 +1183,7 @@ public class DataDictionary {
             if (fieldNode.getNodeName().equals("field") || fieldNode.getNodeName().equals("group")) {
                 name = getAttribute(fieldNode, "name");
                 if (name == null) {
-                    throw new ConfigError("<field> does not have a name attribute");
+                    throw new ConfigError("<quickfix.field> does not have a name attribute");
                 }
 
                 final int num = lookupXMLFieldNumber(document, name);
@@ -1237,7 +1237,7 @@ public class DataDictionary {
     private int lookupXMLFieldNumber(Document document, Node node) throws ConfigError {
         final Element element = (Element) node;
         if (!element.hasAttribute("name")) {
-            throw new ConfigError("No name given to field");
+            throw new ConfigError("No name given to quickfix.field");
         }
         return lookupXMLFieldNumber(document, element.getAttribute("name"));
     }
@@ -1272,7 +1272,7 @@ public class DataDictionary {
                     || componentFieldNode.getNodeName().equals("group")) {
                 name = getAttribute(componentFieldNode, "name");
                 if (name == null) {
-                    throw new ConfigError("No name given to field");
+                    throw new ConfigError("No name given to quickfix.field");
                 }
 
                 final int field = lookupXMLFieldNumber(document, name);
@@ -1429,9 +1429,9 @@ public class DataDictionary {
         }
 
         /**
-         * Returns the delimiter field used to start a repeating group instance.
+         * Returns the delimiter quickfix.field used to start a repeating group instance.
          *
-         * @return delimiter field
+         * @return delimiter quickfix.field
          */
         public int getDelimiterField() {
             return delimiterField;
