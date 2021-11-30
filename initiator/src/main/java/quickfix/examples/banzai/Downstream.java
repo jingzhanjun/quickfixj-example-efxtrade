@@ -117,8 +117,8 @@ public class Downstream {
 //                for(int o=0;o<1;o++){
 //                    String symbol=ss[o];
 ////            testMarketDataRequest();
-//            testNewOrderSingle();
-                testQuoteRequest();
+            testNewOrderSingle();
+//                testQuoteRequest();
 //                    testQuoteRequest(o,symbol);
 //                    Thread.sleep(1000);
 ////                    Thread.sleep(10000);
@@ -137,15 +137,15 @@ public class Downstream {
         newOrderSingle.setField(new ClOrdID("ClOrdID_"+UUID.randomUUID().toString()));
         newOrderSingle.setField(new Side('1'));//1-b,2-s
         newOrderSingle.setField(new Account("client1@trapi"));
-        newOrderSingle.setField(new Issuer("1033"));
-        newOrderSingle.setField(new QuoteRespID("22430"));
+        newOrderSingle.setField(new Issuer("1044"));
+        newOrderSingle.setField(new QuoteRespID("22570"));
         newOrderSingle.setField(new QuoteMsgID("GenIdeal"));
         newOrderSingle.setField(new Spread(Double.valueOf("10")));//markup
         newOrderSingle.setField(new TradeDate(new SimpleDateFormat("yyyyMMdd").format(new Date())));
         //added=====================================
-        newOrderSingle.setField(new Symbol("EUR.USD"));
+        newOrderSingle.setField(new Symbol("AUD.JPY"));
         newOrderSingle.setField(new OrderQty(Double.valueOf("5000")));
-        newOrderSingle.setField(new SettlType("0"));//0-SPOT,1-2D
+        newOrderSingle.setField(new SettlType("0"));//0-SPOT,1-TODAY
         newOrderSingle.setField(new ExecutionStyle(2));//1-rfq,2-rfs,3-one click
         //one click fixed==================================
         newOrderSingle.setField(new DPS(4));
@@ -164,8 +164,7 @@ public class Downstream {
         qr.setField(new Symbol("EUR.USD"));
         qr.setField(new Side('7'));//1-b,2-s,7-not tell
         qr.setField(new ExecutionStyle(2));//1.rfq,2.rfs
-        qr.setField(new OrdType('1'));//1-Market,2-Limit
-        qr.setField(new SettlType("0"));//0-SPOT,1-2D
+        qr.setField(new SettlType("0"));//0-SPOT,1-TODAY
 //        qr.setField(new Account("0"));//0-SPOT,1-2D
         qr.setField(new OrderQty(Double.valueOf("5000")));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
