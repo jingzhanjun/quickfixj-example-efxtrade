@@ -20,6 +20,8 @@
 package quickfix.examples.banzai;
 
 import com.pactera.fix.custom.*;
+import com.pactera.fix.domain.NOS;
+import com.pactera.fix.domain.QR;
 import org.quickfixj.jmx.JmxExporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -114,7 +117,7 @@ public class Downstream {
             String symbols="AUDCAD,AUDCHF,AUDHKD,AUDJPY,AUDNZD,AUDUSD,CADCHF,CADHKD,CADJPY,CHFHKD,CHFJPY,EURAUD,EURCAD,EURCHF,EURGBP,EURHKD,EURJPY,EURNZD,EURUSD,GBPAUD,GBPCAD,GBPCHF,GBPHKD,GBPJPY,GBPNZD,GBPUSD,HKDCNH,HKDJPY,NZDCAD,NZDCHF,NZDHKD,NZDJPY,NZDUSD,USDCAD,USDCHF,USDCNH,USDHKD,USDJPY,XAUUSD";
             if(args!=null&&args.length>0){
                 int tradeType=Integer.valueOf(args[0]);
-//                if(tradeType==3){
+                if(tradeType==3){
                     String settlType=args[1];
                     String amount=args[2];
                     char way=args[3].charAt(0);
@@ -125,37 +128,93 @@ public class Downstream {
                     int DPS=Integer.valueOf(args[8]);
                     Double streamQuote=Double.valueOf(args[9]);
                     int oneClickAction=Integer.valueOf(args[10]);
-                    testNewOrderSingle(tradeType,settlType,amount,way,orderId,userId,clientId,symbol,DPS,streamQuote,oneClickAction);
-//                }else{
-//                    String settlType=args[1];
-//                    String amount=args[2];
-//                    char way=args[3].charAt(0);
-//                    String symbol=args[4];
-//                    testQuoteRequest(tradeType,settlType,amount,way,symbol);
-//                }
+                    NOS nos=new NOS();
+                    nos.setPartyID("EFX_TRADE");
+                    nos.setQuoteReqID("a");
+                    nos.setQuoteID("a");
+                    nos.setClOrdID(UUID.randomUUID().toString());
+                    nos.setSide(way);
+                    nos.setAccount(clientId);
+                    nos.setIssuer(userId);
+                    nos.setQuoteRespID(orderId);
+                    nos.setQuoteMsgID("GenIdeal");
+                    nos.setSpread(Double.valueOf(10));
+                    nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    nos.setSettlType(settlType);
+                    nos.setExecutionStyle(3);
+                    nos.setPrice(Double.valueOf("0.0"));
+                    nos.setSymbol(symbol);
+                    nos.setOrderQty(Double.valueOf(amount));
+                    nos.setDps(DPS);
+                    nos.setOneClickTolerance(Double.valueOf("0.0007"));
+                    nos.setOneClickAction(oneClickAction);
+                    nos.setStreamingQuote(Double.valueOf(streamQuote));
+                    testNewOrderSingle(nos);
+                }else{
+                    String settlType=args[1];
+                    String amount=args[2];
+                    char way=args[3].charAt(0);
+                    String symbol=args[4];
+                    QR qr=new QR();
+                    qr.setQuoteReqID(UUID.randomUUID().toString());
+                    qr.setPartyID("EFX_TRADE");
+                    qr.setSymbol(symbol);
+                    qr.setSide(way);
+                    qr.setExecutionStyle(1);
+                    qr.setSettlType(settlType);
+                    qr.setAccount("");
+                    qr.setOrderQty(Double.valueOf(amount));
+                    qr.setTransactTime(LocalDateTime.now());
+                    testQuoteRequest(qr);
+                }
             }else{
-                int tradeType=Integer.valueOf(3);
-                String settlType="0";
-                String amount="20000";
-                char way='1';
-                String orderId="";
-                String userId="";
-                String clientId="";
-                String symbol="EUR.USD";
-                int DPS=3;
-                Double streamQuote=Double.valueOf("80.261");
-                int oneClickAction=2;
-                testNewOrderSingle(tradeType,settlType,amount,way,orderId,userId,clientId,symbol,DPS,streamQuote,oneClickAction);
+                localNOS();
+                localQR();
+//                testQuoteCancel();
             }
-//                testQuoteRequest();
-//                    testQuoteRequest(o,symbol);
-//                    Thread.sleep(1000);
-////                    Thread.sleep(10000);
-//                }
-//            testQuoteCancel();
+
 //            }
         }
         shutdownLatch.await();
+    }
+
+    private static void localQR() throws SessionNotFound {
+        QR qr=new QR();
+        qr.setQuoteReqID(UUID.randomUUID().toString());
+        qr.setPartyID("EFX_TRADE");
+        qr.setSymbol("USD.JPY");
+        qr.setSide('1');
+        qr.setExecutionStyle(1);
+        qr.setSettlType("0");
+        qr.setAccount("");
+        qr.setOrderQty(Double.valueOf("5000"));
+        qr.setTransactTime(LocalDateTime.now());
+        testQuoteRequest(qr);
+    }
+
+    private static void localNOS() throws SessionNotFound {
+        NOS nos=new NOS();
+        nos.setPartyID("EFX_TRADE");
+        nos.setQuoteReqID("a");
+        nos.setQuoteID("a");
+        nos.setClOrdID(UUID.randomUUID().toString());
+        nos.setSide('1');
+        nos.setAccount("client1@trapi");
+        nos.setIssuer("1004");
+        nos.setQuoteRespID("23382");
+        nos.setQuoteMsgID("GenIdeal");
+        nos.setSpread(Double.valueOf(10));
+        nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        nos.setSettlType("0");
+        nos.setExecutionStyle(3);
+        nos.setPrice(Double.valueOf("0.0"));
+        nos.setSymbol("AUD.CAD");
+        nos.setOrderQty(Double.valueOf("2500"));
+        nos.setDps(4);
+        nos.setOneClickTolerance(Double.valueOf("0.0007"));
+        nos.setOneClickAction(2);
+        nos.setStreamingQuote(Double.valueOf("0.91775"));
+        testNewOrderSingle(nos);
     }
 
     private static void testNewOrderSingle(int tradeType,String settlType,String amount, char way,String orderId,String userId,String clientId,String symbol,int DPS,Double quote,int oneClickAction) throws SessionNotFound {
@@ -186,6 +245,34 @@ public class Downstream {
         Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
     }
 
+    private static void testNewOrderSingle(NOS nos) throws SessionNotFound {
+        NewOrderSingle newOrderSingle = new NewOrderSingle();
+        newOrderSingle.setField(new PartyID(nos.getPartyID()));
+        newOrderSingle.setField(new QuoteReqID(nos.getQuoteReqID()));
+        newOrderSingle.setField(new QuoteID(nos.getQuoteID()));
+        newOrderSingle.setField(new ClOrdID(nos.getClOrdID()));
+        newOrderSingle.setField(new Side(nos.getSide()));//1-b,2-s
+        newOrderSingle.setField(new Account(nos.getAccount()));//"client1@trapi"
+        newOrderSingle.setField(new Issuer(nos.getIssuer()));
+        newOrderSingle.setField(new QuoteRespID(nos.getQuoteRespID()));
+        newOrderSingle.setField(new QuoteMsgID(nos.getQuoteMsgID()));
+        newOrderSingle.setField(new Spread(nos.getSpread()));//markup
+        newOrderSingle.setField(new TradeDate(nos.getTradeDate()));
+        //added=====================================
+        newOrderSingle.setField(new SettlType(nos.getSettlType()));//0-SPOT,1-TODAY
+        newOrderSingle.setField(new ExecutionStyle(nos.getExecutionStyle()));//1-rfq,2-rfs,3-one click
+        newOrderSingle.setField(new Price(nos.getPrice()));
+        //one click fixed==================================
+        newOrderSingle.setField(new Symbol(nos.getSymbol()));
+        newOrderSingle.setField(new OrderQty(nos.getOrderQty()));
+        newOrderSingle.setField(new DPS(nos.getDps()));
+        newOrderSingle.setField(new OneClickTolerance(nos.getOneClickTolerance()));
+        newOrderSingle.setField(new OneClickAction(nos.getOneClickAction()));//1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE
+        newOrderSingle.setField(new StreamingQuote(nos.getStreamingQuote()));
+
+        Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
+    }
+
     private static void testQuoteRequest(int tradeType,String settlType,String amount, char way,String symbol) throws SessionNotFound{
         QuoteRequest qr=new QuoteRequest();
         qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
@@ -199,23 +286,16 @@ public class Downstream {
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
         Session.sendToTarget(qr,initiator.getSessions().get(0));
     }
-    private static void testQuoteRequest(int i, String symbol) throws SessionNotFound{
-        int a=i%2;
-        char side='0';
-        if(a==1){
-            side='1';
-        }
-        if(a==0){
-            side='2';
-        }
+    private static void testQuoteRequest(QR quoteObj) throws SessionNotFound{
         QuoteRequest qr=new QuoteRequest();
-        qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
-        qr.setField(new PartyID("EFX_TRADE"));
-        qr.setField(new Symbol(symbol));
-        qr.setField(new Side(side));//1-b,2-s,7-not tell
-        qr.setField(new QuoteType(1));//1.rfq,2.rfs,3.oneClick
-        qr.setField(new OrdType('2'));
-        qr.setField(new OptPayAmount(Double.valueOf("1000")));
+        qr.setField(new QuoteReqID(quoteObj.getQuoteReqID()));
+        qr.setField(new PartyID(quoteObj.getPartyID()));
+        qr.setField(new Symbol(quoteObj.getSymbol()));
+        qr.setField(new Side(quoteObj.getSide()));//1-b,2-s,7-not tell
+        qr.setField(new ExecutionStyle(quoteObj.getExecutionStyle()));//1.rfq,2.rfs
+        qr.setField(new SettlType(quoteObj.getSettlType()));//0-SPOT,1-TODAY
+        qr.setField(new Account(quoteObj.getAccount()));//0-SPOT,1-2D
+        qr.setField(new OrderQty(quoteObj.getOrderQty()));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
         Session.sendToTarget(qr,initiator.getSessions().get(0));
     }
