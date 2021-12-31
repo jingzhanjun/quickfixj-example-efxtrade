@@ -168,9 +168,10 @@ public class Downstream {
                     testQuoteRequest(qr);
                 }
             }else{
-//                localNOS();
-                localQR();
+                localNOS();
+//                localQR();
 //                testQuoteCancel();
+                shutdownLatch.countDown();
             }
 
 //            }
@@ -181,8 +182,8 @@ public class Downstream {
     private static void localQR() throws SessionNotFound {
         String clientMapping="EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
         String[] items = clientMapping.split("[,]");
-//        for(int i = 0; i< 1; i++){
-//            if(items[6]!=null&&!items[6].equals("")){
+        for(int i = 0; i< 1; i++){
+            if(items[6]!=null&&!items[6].equals("")){
                 QR qr=new QR();
                 qr.setQuoteReqID(UUID.randomUUID().toString());
                 qr.setPartyID("EFX_TRADE");
@@ -190,12 +191,12 @@ public class Downstream {
                 qr.setSide('7');
                 qr.setExecutionStyle(2);
                 qr.setSettlType("0");
-                qr.setAccount(""/*items[6].split("[.]")[0]*/);
+                qr.setAccount(items[6].split("[.]")[0]);
                 qr.setOrderQty(Double.valueOf("5000"));
                 qr.setTransactTime(LocalDateTime.now());
                 testQuoteRequest(qr);
-//            }
-//        }
+            }
+        }
     }
 
     private static void localNOS() throws SessionNotFound {

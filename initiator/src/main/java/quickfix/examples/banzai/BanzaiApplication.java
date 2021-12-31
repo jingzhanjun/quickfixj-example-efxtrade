@@ -21,19 +21,7 @@ package quickfix.examples.banzai;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quickfix.Application;
-import quickfix.DefaultMessageFactory;
-import quickfix.DoNotSend;
-import quickfix.FieldNotFound;
-import quickfix.FixVersions;
-import quickfix.IncorrectDataFormat;
-import quickfix.IncorrectTagValue;
-import quickfix.Message;
-import quickfix.RejectLogon;
-import quickfix.Session;
-import quickfix.SessionID;
-import quickfix.SessionNotFound;
-import quickfix.UnsupportedMessageType;
+import quickfix.*;
 import quickfix.field.*;
 import quickfix.field.Currency;
 import quickfix.fix50sp1.MarketDataIncrementalRefresh;
@@ -43,7 +31,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class BanzaiApplication implements Application {
+public class BanzaiApplication extends MessageCracker implements Application {
     private Logger log= LoggerFactory.getLogger(getClass());
     private final DefaultMessageFactory messageFactory = new DefaultMessageFactory();
     private OrderTableModel orderTableModel = null;
@@ -80,8 +68,8 @@ public class BanzaiApplication implements Application {
         try {
             String msgType = message.getHeader().getString(MsgType.FIELD);
             if(MsgType.LOGON.compareTo(msgType) == 0){
-                message.setString(Username.FIELD, "user1");
-                message.setString(Password.FIELD, "pass1");
+                message.setString(Username.FIELD, "user");
+                message.setString(Password.FIELD, "pass");
             }
         } catch (FieldNotFound e) {
             e.printStackTrace();
@@ -91,8 +79,12 @@ public class BanzaiApplication implements Application {
     public void toApp(quickfix.Message message, SessionID sessionID) throws DoNotSend {
     }
 
-    public void fromAdmin(quickfix.Message message, SessionID sessionID) throws FieldNotFound,
-            IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+    public void fromAdmin(quickfix.Message message, SessionID sessionID) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
+        try {
+            crack(message, sessionID);
+        } catch (UnsupportedMessageType | FieldNotFound | IncorrectTagValue e) {
+            e.printStackTrace();
+        }
     }
 
     public void fromApp(quickfix.Message message, SessionID sessionID) throws FieldNotFound,
