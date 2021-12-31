@@ -19,7 +19,10 @@
 
 package quickfix.examples.banzai;
 
-import com.pactera.fix.custom.*;
+import com.pactera.fix.custom.ExecutionStyle;
+import com.pactera.fix.custom.OneClickAction;
+import com.pactera.fix.custom.OneClickTolerance;
+import com.pactera.fix.custom.StreamingQuote;
 import com.pactera.fix.domain.NOS;
 import com.pactera.fix.domain.QR;
 import org.quickfixj.jmx.JmxExporter;
@@ -28,13 +31,10 @@ import org.slf4j.LoggerFactory;
 import quickfix.*;
 import quickfix.field.*;
 import quickfix.fix43.NewOrderSingle;
-import quickfix.fix50sp1.MarketDataRequest;
-import quickfix.fix50sp1.QuoteCancel;
 import quickfix.fix50sp1.QuoteRequest;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -168,7 +168,7 @@ public class Downstream {
                     testQuoteRequest(qr);
                 }
             }else{
-                localNOS();
+//                localNOS();
                 localQR();
 //                testQuoteCancel();
             }
@@ -179,70 +179,52 @@ public class Downstream {
     }
 
     private static void localQR() throws SessionNotFound {
-        QR qr=new QR();
-        qr.setQuoteReqID(UUID.randomUUID().toString());
-        qr.setPartyID("EFX_TRADE");
-        qr.setSymbol("USD.JPY");
-        qr.setSide('1');
-        qr.setExecutionStyle(1);
-        qr.setSettlType("0");
-        qr.setAccount("");
-        qr.setOrderQty(Double.valueOf("5000"));
-        qr.setTransactTime(LocalDateTime.now());
-        testQuoteRequest(qr);
+        String clientMapping="EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
+        String[] items = clientMapping.split("[,]");
+//        for(int i = 0; i< 1; i++){
+//            if(items[6]!=null&&!items[6].equals("")){
+                QR qr=new QR();
+                qr.setQuoteReqID(UUID.randomUUID().toString());
+                qr.setPartyID("EFX_TRADE");
+                qr.setSymbol("USD.JPY");
+                qr.setSide('7');
+                qr.setExecutionStyle(2);
+                qr.setSettlType("0");
+                qr.setAccount(""/*items[6].split("[.]")[0]*/);
+                qr.setOrderQty(Double.valueOf("5000"));
+                qr.setTransactTime(LocalDateTime.now());
+                testQuoteRequest(qr);
+//            }
+//        }
     }
 
     private static void localNOS() throws SessionNotFound {
-        NOS nos=new NOS();
-        nos.setPartyID("EFX_TRADE");
-        nos.setQuoteReqID("a");
-        nos.setQuoteID("a");
-        nos.setClOrdID(UUID.randomUUID().toString());
-        nos.setSide('1');
-        nos.setAccount("client1@trapi");
-        nos.setIssuer("1004");
-        nos.setQuoteRespID("23382");
-        nos.setQuoteMsgID("GenIdeal");
-        nos.setSpread(Double.valueOf(10));
-        nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        nos.setSettlType("0");
-        nos.setExecutionStyle(3);
-        nos.setPrice(Double.valueOf("0.0"));
-        nos.setSymbol("AUD.CAD");
-        nos.setOrderQty(Double.valueOf("2500"));
-        nos.setDps(4);
-        nos.setOneClickTolerance(Double.valueOf("0.0007"));
-        nos.setOneClickAction(2);
-        nos.setStreamingQuote(Double.valueOf("0.91775"));
-        testNewOrderSingle(nos);
-    }
-
-    private static void testNewOrderSingle(int tradeType,String settlType,String amount, char way,String orderId,String userId,String clientId,String symbol,int DPS,Double quote,int oneClickAction) throws SessionNotFound {
-        NewOrderSingle newOrderSingle = new NewOrderSingle();
-        newOrderSingle.setField(new PartyID("EFX_TRADE"));
-        newOrderSingle.setField(new QuoteReqID("QuoteRequestID_be5548ba-b16d-4674-a718-366de4cbc342"));
-        newOrderSingle.setField(new QuoteID("QuoteID_bd4d108f-d353-464e-add2-633e755bfe71"));
-        newOrderSingle.setField(new ClOrdID("ClOrdID_"+UUID.randomUUID().toString()));
-        newOrderSingle.setField(new Side(way));//1-b,2-s
-        newOrderSingle.setField(new Account(clientId));//"client1@trapi"
-        newOrderSingle.setField(new Issuer(userId));
-        newOrderSingle.setField(new QuoteRespID(orderId));
-        newOrderSingle.setField(new QuoteMsgID("GenIdeal"));
-        newOrderSingle.setField(new Spread(Double.valueOf("10")));//markup
-        newOrderSingle.setField(new TradeDate(new SimpleDateFormat("yyyyMMdd").format(new Date())));
-        //added=====================================
-        newOrderSingle.setField(new SettlType(settlType));//0-SPOT,1-TODAY
-        newOrderSingle.setField(new ExecutionStyle(tradeType));//1-rfq,2-rfs,3-one click
-        newOrderSingle.setField(new Price(Double.valueOf("1.12397")));
-        //one click fixed==================================
-        newOrderSingle.setField(new Symbol(symbol));
-        newOrderSingle.setField(new OrderQty(Double.valueOf(amount)));
-        newOrderSingle.setField(new DPS(DPS));
-        newOrderSingle.setField(new OneClickTolerance(0.005));
-        newOrderSingle.setField(new OneClickAction(oneClickAction));//1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE
-        newOrderSingle.setField(new StreamingQuote(quote));
-
-        Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
+        String clientMapping="EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
+//        for(String client:clientMapping.split("[,]")){
+//            if(client!=null&&!client.equals("")){
+                NOS nos=new NOS();
+                nos.setPartyID("EFX_TRADE");
+                nos.setQuoteReqID("a");
+                nos.setQuoteID("a");
+                nos.setClOrdID(UUID.randomUUID().toString());
+                nos.setSide('1');
+                nos.setAccount(""/**client.split("[.]")[0]*/);
+                nos.setIssuer("1004");
+                nos.setQuoteRespID("23631");
+                nos.setQuoteMsgID("GenIdeal");
+                nos.setSpread(Double.valueOf(10));
+                nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                nos.setSettlType("0");
+                nos.setExecutionStyle(3);
+                nos.setPrice(Double.valueOf("0.0"));
+                nos.setSymbol("USD.JPY");
+                nos.setOrderQty(Double.valueOf("2500"));
+                nos.setOneClickTolerance(Double.valueOf("0.007"));
+                nos.setOneClickAction(2);
+                nos.setStreamingQuote(Double.valueOf("113.445"));
+                testNewOrderSingle(nos);
+//            }
+//        }
     }
 
     private static void testNewOrderSingle(NOS nos) throws SessionNotFound {
@@ -265,7 +247,6 @@ public class Downstream {
         //one click fixed==================================
         newOrderSingle.setField(new Symbol(nos.getSymbol()));
         newOrderSingle.setField(new OrderQty(nos.getOrderQty()));
-        newOrderSingle.setField(new DPS(nos.getDps()));
         newOrderSingle.setField(new OneClickTolerance(nos.getOneClickTolerance()));
         newOrderSingle.setField(new OneClickAction(nos.getOneClickAction()));//1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE
         newOrderSingle.setField(new StreamingQuote(nos.getStreamingQuote()));
@@ -273,19 +254,6 @@ public class Downstream {
         Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
     }
 
-    private static void testQuoteRequest(int tradeType,String settlType,String amount, char way,String symbol) throws SessionNotFound{
-        QuoteRequest qr=new QuoteRequest();
-        qr.setField(new QuoteReqID("QuoteRequestID_"+ UUID.randomUUID().toString()));
-        qr.setField(new PartyID("EFX_TRADE"));
-        qr.setField(new Symbol(symbol));
-        qr.setField(new Side(way));//1-b,2-s,7-not tell
-        qr.setField(new ExecutionStyle(tradeType));//1.rfq,2.rfs
-        qr.setField(new SettlType(settlType));//0-SPOT,1-TODAY
-//        qr.setField(new Account("0"));//0-SPOT,1-2D
-        qr.setField(new OrderQty(Double.valueOf(amount)));
-        qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
-        Session.sendToTarget(qr,initiator.getSessions().get(0));
-    }
     private static void testQuoteRequest(QR quoteObj) throws SessionNotFound{
         QuoteRequest qr=new QuoteRequest();
         qr.setField(new QuoteReqID(quoteObj.getQuoteReqID()));
@@ -298,23 +266,6 @@ public class Downstream {
         qr.setField(new OrderQty(quoteObj.getOrderQty()));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
         Session.sendToTarget(qr,initiator.getSessions().get(0));
-    }
-
-    private static void testMarketDataRequest() throws SessionNotFound {
-        MarketDataRequest marketDataRequest=new MarketDataRequest();
-        marketDataRequest.setField(new SubscriptionRequestType('1'));
-        marketDataRequest.setField(new MDReqID("TEST_marketDataRequest"));
-        marketDataRequest.setField(new Symbol("USD/CNY"));
-        marketDataRequest.setField(new MarketDepth(1));
-        Session.sendToTarget(marketDataRequest,initiator.getSessions().get(0));
-    }
-
-    private static void testQuoteCancel() throws SessionNotFound {
-        QuoteCancel quoteCancel=new QuoteCancel();
-        quoteCancel.setField(new QuoteID("TEST_QuoteID"));
-        quoteCancel.setField(new QuoteCancelType(5));
-        quoteCancel.setField(new QuoteReqID("test_QuoteReqID"));
-        Session.sendToTarget(quoteCancel,initiator.getSessions().get(0));
     }
 
 }
