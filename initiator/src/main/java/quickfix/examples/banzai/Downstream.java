@@ -209,7 +209,7 @@ public class Downstream {
                 nos.setQuoteID("a");
                 nos.setClOrdID(UUID.randomUUID().toString());
                 nos.setSide('1');
-                nos.setAccount(""/**client.split("[.]")[0]*/);
+                nos.setAccount("MarginPromotion");
                 nos.setIssuer("1004");
                 nos.setQuoteRespID("23631");
                 nos.setQuoteMsgID("GenIdeal");

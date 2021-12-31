@@ -23,13 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quickfix.*;
 import quickfix.field.*;
-import quickfix.field.Currency;
-import quickfix.fix50sp1.MarketDataIncrementalRefresh;
-import quickfix.tools.FixMessageUtils;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 
 public class BanzaiApplication extends MessageCracker implements Application {
     private Logger log= LoggerFactory.getLogger(getClass());
@@ -93,6 +93,11 @@ public class BanzaiApplication extends MessageCracker implements Application {
             SwingUtilities.invokeLater(new MessageProcessor(message, sessionID));
         } catch (Exception e) {
         }
+    }
+
+    @Override
+    protected void onMessage(Message message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
+        log.info("message:"+message);
     }
 
     public class MessageProcessor implements Runnable {
