@@ -141,7 +141,7 @@ public class Downstream {
                     nos.setSpread(Double.valueOf(10));
                     nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     nos.setSettlType(settlType);
-                    nos.setExecutionStyle(3);
+                    nos.setExecutionStyle(tradeType);
                     nos.setPrice(Double.valueOf("0.0"));
                     nos.setSymbol(symbol);
                     nos.setOrderQty(Double.valueOf(amount));
@@ -150,31 +150,34 @@ public class Downstream {
                     nos.setOneClickAction(oneClickAction);
                     nos.setStreamingQuote(Double.valueOf(streamQuote));
                     testNewOrderSingle(nos);
-                }else{
+                }
+                if(tradeType<3){
                     String settlType=args[1];
                     String amount=args[2];
                     char way=args[3].charAt(0);
                     String symbol=args[4];
+                    String account=args[5];
                     QR qr=new QR();
                     qr.setQuoteReqID(UUID.randomUUID().toString());
                     qr.setPartyID("EFX_TRADE");
                     qr.setSymbol(symbol);
                     qr.setSide(way);
-                    qr.setExecutionStyle(1);
+                    qr.setExecutionStyle(tradeType);
                     qr.setSettlType(settlType);
-                    qr.setAccount("");
+                    qr.setAccount(account);
                     qr.setOrderQty(Double.valueOf(amount));
                     qr.setTransactTime(LocalDateTime.now());
                     testQuoteRequest(qr);
                 }
             }else{
-                localNOS();
+                for(int i=0;i<20;i++){
+                    localNOS();
+                    Thread.sleep(10000);
+                }
 //                localQR();
 //                testQuoteCancel();
-                shutdownLatch.countDown();
             }
-
-//            }
+//            shutdownLatch.countDown();
         }
         shutdownLatch.await();
     }
@@ -210,8 +213,8 @@ public class Downstream {
                 nos.setClOrdID(UUID.randomUUID().toString());
                 nos.setSide('1');
                 nos.setAccount("MarginPromotion");
-                nos.setIssuer("1004");
-                nos.setQuoteRespID("23631");
+                nos.setIssuer("1247");
+                nos.setQuoteRespID("24538");
                 nos.setQuoteMsgID("GenIdeal");
                 nos.setSpread(Double.valueOf(10));
                 nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
