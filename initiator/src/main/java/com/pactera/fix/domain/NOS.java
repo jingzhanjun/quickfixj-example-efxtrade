@@ -38,6 +38,15 @@ public class NOS implements Serializable {
     /**1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE*/
     private Integer oneClickAction;
     private Double streamingQuote;
+    private Character handlInst;
+
+    public Character getHandlInst() {
+        return handlInst;
+    }
+
+    public void setHandlInst(Character handlInst) {
+        this.handlInst = handlInst;
+    }
 
     public String getPartyID() {
         return partyID;

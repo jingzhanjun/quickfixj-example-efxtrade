@@ -33,6 +33,7 @@ import quickfix.field.*;
 import quickfix.fix43.NewOrderSingle;
 import quickfix.fix50sp1.QuoteRequest;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ import java.util.concurrent.CountDownLatch;
  * Entry point for the Downstream application.
  */
 public class Downstream {
-    private static final CountDownLatch shutdownLatch = new CountDownLatch(1);
+//    private static final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
     private static final Logger log = LoggerFactory.getLogger(Downstream.class);
     private static Downstream downstream;
@@ -58,7 +59,14 @@ public class Downstream {
         if (args.length == 0) {
             inputStream = Downstream.class.getResourceAsStream("banzai.cfg");
         } else if (args.length == 1) {
-            inputStream = new FileInputStream(args[0]);
+            File file = new File(args[0]);
+            if (file.exists()) {
+                log.info("配置文件[{}]存在，使用该配置", args[0]);
+                inputStream = new FileInputStream(args[0]);
+            } else {
+                log.info("配置文件[{}]不存在，使用默认配置");
+                inputStream = Downstream.class.getResourceAsStream("banzai.cfg");
+            }
         }
         if (inputStream == null) {
             System.out.println("usage: " + Downstream.class.getName() + " [configFile].");
@@ -104,62 +112,77 @@ public class Downstream {
     }
 
     public void stop() {
-        shutdownLatch.countDown();
+//        shutdownLatch.countDown();
     }
 
     public static void main(String[] args) throws Exception {
+
         try {
-            downstream = new Downstream(new String[]{});
+            String way = null;
+            String configuration = args[7];
+            if (configuration.contains("EFX")) {
+                way = "./efx_trade.cfg";
+            }
+            if (configuration.contains("PDP")) {
+                way = "./pdp_trade.cfg";
+            }
+            downstream = new Downstream(new String[]{way});
             downstream.logon();
         } catch (Exception e) {
             log.info(e.getMessage(), e);
-        }finally{
-            String symbols="AUDCAD,AUDCHF,AUDHKD,AUDJPY,AUDNZD,AUDUSD,CADCHF,CADHKD,CADJPY,CHFHKD,CHFJPY,EURAUD,EURCAD,EURCHF,EURGBP,EURHKD,EURJPY,EURNZD,EURUSD,GBPAUD,GBPCAD,GBPCHF,GBPHKD,GBPJPY,GBPNZD,GBPUSD,HKDCNH,HKDJPY,NZDCAD,NZDCHF,NZDHKD,NZDJPY,NZDUSD,USDCAD,USDCHF,USDCNH,USDHKD,USDJPY,XAUUSD";
-            if(args!=null&&args.length>0){
-                int tradeType=Integer.valueOf(args[0]);
-                if(tradeType==3){
-                    String settlType=args[1];
-                    String amount=args[2];
-                    char way=args[3].charAt(0);
-                    String orderId=args[4];
-                    String userId=args[5];
-                    String clientId=args[6];
-                    String symbol=args[7];
-                    int DPS=Integer.valueOf(args[8]);
-                    Double streamQuote=Double.valueOf(args[9]);
-                    int oneClickAction=Integer.valueOf(args[10]);
-                    NOS nos=new NOS();
-                    nos.setPartyID("EFX_TRADE");
+        } finally {
+            String symbols = "AUDCAD,AUDCHF,AUDHKD,AUDJPY,AUDNZD,AUDUSD,CADCHF,CADHKD,CADJPY,CHFHKD,CHFJPY,EURAUD,EURCAD,EURCHF,EURGBP,EURHKD,EURJPY,EURNZD,EURUSD,GBPAUD,GBPCAD,GBPCHF,GBPHKD,GBPJPY,GBPNZD,GBPUSD,HKDCNH,HKDJPY,NZDCAD,NZDCHF,NZDHKD,NZDJPY,NZDUSD,USDCAD,USDCHF,USDCNH,USDHKD,USDJPY,XAUUSD";
+            if (args != null && args.length > 0) {
+                int tradeType = Integer.valueOf(args[0]);
+                int transactionType = Integer.valueOf(args[6]);
+                if (transactionType == 2) {
+                    // 下单
+                    String settlType = args[1];
+                    String amount = args[2];
+                    char way = args[3].charAt(0);
+                    String orderId = args[4];
+                    String userId = args[5];
+                    String clientId = args[11];
+                    String symbol = args[14];
+//                    int DPS = Integer.valueOf(args[8]);
+                    char handlInst = args[8].charAt(0);
+                    Double streamQuote = Double.valueOf(args[9]);
+                    int oneClickAction = Integer.valueOf(args[10]);
+                    NOS nos = new NOS();
+                    nos.setPartyID(args[7]);
                     nos.setQuoteReqID("a");
-                    nos.setQuoteID("a");
+//                    nos.setQuoteID("a");
+                    nos.setQuoteID(args[16]);
                     nos.setClOrdID(UUID.randomUUID().toString());
                     nos.setSide(way);
                     nos.setAccount(clientId);
                     nos.setIssuer(userId);
                     nos.setQuoteRespID(orderId);
                     nos.setQuoteMsgID("GenIdeal");
-                    nos.setSpread(Double.valueOf(10));
+                    nos.setSpread(Double.valueOf(args[12]));
                     nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     nos.setSettlType(settlType);
                     nos.setExecutionStyle(tradeType);
-                    nos.setPrice(Double.valueOf("0.0"));
+                    nos.setPrice(Double.valueOf(args[15]));
                     nos.setSymbol(symbol);
                     nos.setOrderQty(Double.valueOf(amount));
-                    nos.setDps(DPS);
-                    nos.setOneClickTolerance(Double.valueOf("0.0007"));
+//                    nos.setDps(DPS);
+                    nos.setOneClickTolerance(Double.valueOf(args[13]));
                     nos.setOneClickAction(oneClickAction);
                     nos.setStreamingQuote(Double.valueOf(streamQuote));
+                    nos.setHandlInst(handlInst);
                     testNewOrderSingle(nos);
                 }
-                if(tradeType<3){
-                    String settlType=args[1];
-                    String amount=args[2];
-                    char way=args[3].charAt(0);
-                    String symbol=args[4];
-                    String account=args[5];
-                    QR qr=new QR();
+                if (transactionType == 1) {
+                    // 询价
+                    String settlType = args[1];
+                    String amount = args[2];
+                    char way = args[3].charAt(0);
+                    String symbol = args[4];
+                    String account = args[5];
+                    QR qr = new QR();
                     qr.setQuoteReqID(UUID.randomUUID().toString());
-                    qr.setPartyID("EFX_TRADE");
+                    qr.setPartyID(args[7]);
                     qr.setSymbol(symbol);
                     qr.setSide(way);
                     qr.setExecutionStyle(tradeType);
@@ -169,25 +192,25 @@ public class Downstream {
                     qr.setTransactTime(LocalDateTime.now());
                     testQuoteRequest(qr);
                 }
-            }else{
-                for(int i=0;i<20;i++){
-                    localNOS();
+            } /*else {
+                for (int i = 0; i < 20; i++) {
+//                    localNOS();
                     Thread.sleep(10000);
                 }
 //                localQR();
 //                testQuoteCancel();
-            }
+            }*/
 //            shutdownLatch.countDown();
         }
-        shutdownLatch.await();
+//        shutdownLatch.await();
     }
 
     private static void localQR() throws SessionNotFound {
-        String clientMapping="EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
+        String clientMapping = "EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
         String[] items = clientMapping.split("[,]");
-        for(int i = 0; i< 1; i++){
-            if(items[6]!=null&&!items[6].equals("")){
-                QR qr=new QR();
+        for (int i = 0; i < 1; i++) {
+            if (items[6] != null && !items[6].equals("")) {
+                QR qr = new QR();
                 qr.setQuoteReqID(UUID.randomUUID().toString());
                 qr.setPartyID("EFX_TRADE");
                 qr.setSymbol("USD.JPY");
@@ -202,35 +225,37 @@ public class Downstream {
         }
     }
 
+
     private static void localNOS() throws SessionNotFound {
-        String clientMapping="EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
+        String clientMapping = "EFXTraderPrice.EFXTraderPriceSIT,MarginPromotion.MarginPromotionSIT,MarginVIP.MarginVIPSIT,MarginPlatinum.MarginPlatinumSIT,MarginGold.MarginGoldSIT,MarginSilver.MarginSilverSIT,MarginWide.MarginWideSIT,MarginEvent.MarginEventSIT,NonMarginPromotion.NonMarginPromotionSIT,NonMarginVIP.NonMarginVIPSIT,NonMarginPlatinum.NonMarginPlatinumSIT,NonMarginGold.NonMarginGoldSIT,NonMarginSilver.NonMarginSilverSIT,NonMarginWide.NonMarginWideSIT,NonMarginEvent.NonMarginEventSIT";
 //        for(String client:clientMapping.split("[,]")){
 //            if(client!=null&&!client.equals("")){
-                NOS nos=new NOS();
-                nos.setPartyID("EFX_TRADE");
-                nos.setQuoteReqID("a");
-                nos.setQuoteID("a");
-                nos.setClOrdID(UUID.randomUUID().toString());
-                nos.setSide('1');
-                nos.setAccount("MarginPromotion");
-                nos.setIssuer("1247");
-                nos.setQuoteRespID("24538");
-                nos.setQuoteMsgID("GenIdeal");
-                nos.setSpread(Double.valueOf(10));
-                nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                nos.setSettlType("0");
-                nos.setExecutionStyle(3);
-                nos.setPrice(Double.valueOf("0.0"));
-                nos.setSymbol("USD.JPY");
-                nos.setOrderQty(Double.valueOf("2500"));
-                nos.setOneClickTolerance(Double.valueOf("0.007"));
-                nos.setOneClickAction(2);
-                nos.setStreamingQuote(Double.valueOf("113.445"));
-                testNewOrderSingle(nos);
+        NOS nos = new NOS();
+        nos.setPartyID("EFX_TRADE");
+        nos.setQuoteReqID("a");
+        nos.setQuoteID("a");
+        nos.setClOrdID(UUID.randomUUID().toString());
+        nos.setSide('1');
+        nos.setAccount("MarginPromotion");
+        nos.setIssuer("1247");
+        nos.setQuoteRespID("24538");
+        nos.setQuoteMsgID("GenIdeal");
+        nos.setSpread(Double.valueOf(10));
+        nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        nos.setSettlType("0");
+        nos.setExecutionStyle(3);
+        nos.setPrice(Double.valueOf("0.0"));
+        nos.setSymbol("USD.JPY");
+        nos.setOrderQty(Double.valueOf("2500"));
+        nos.setOneClickTolerance(Double.valueOf("0.007"));
+        nos.setOneClickAction(2);
+        nos.setStreamingQuote(Double.valueOf("113.445"));
+        testNewOrderSingle(nos);
 //            }
 //        }
     }
 
+    //35=D
     private static void testNewOrderSingle(NOS nos) throws SessionNotFound {
         NewOrderSingle newOrderSingle = new NewOrderSingle();
         newOrderSingle.setField(new PartyID(nos.getPartyID()));
@@ -254,12 +279,14 @@ public class Downstream {
         newOrderSingle.setField(new OneClickTolerance(nos.getOneClickTolerance()));
         newOrderSingle.setField(new OneClickAction(nos.getOneClickAction()));//1-FILL_AT_MY_RATE_ONLY,2-FILL_AT_LATEST,3-SLIPPAGE
         newOrderSingle.setField(new StreamingQuote(nos.getStreamingQuote()));
+        newOrderSingle.setField(new HandlInst(nos.getHandlInst()));
 
-        Session.sendToTarget(newOrderSingle,initiator.getSessions().get(0));
+        Session.sendToTarget(newOrderSingle, initiator.getSessions().get(0));
     }
 
-    private static void testQuoteRequest(QR quoteObj) throws SessionNotFound{
-        QuoteRequest qr=new QuoteRequest();
+    //35=R/RFQ/RFS
+    private static void testQuoteRequest(QR quoteObj) throws SessionNotFound {
+        QuoteRequest qr = new QuoteRequest();
         qr.setField(new QuoteReqID(quoteObj.getQuoteReqID()));
         qr.setField(new PartyID(quoteObj.getPartyID()));
         qr.setField(new Symbol(quoteObj.getSymbol()));
@@ -269,7 +296,6 @@ public class Downstream {
         qr.setField(new Account(quoteObj.getAccount()));//0-SPOT,1-2D
         qr.setField(new OrderQty(quoteObj.getOrderQty()));
         qr.setField(new TransactTime(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
-        Session.sendToTarget(qr,initiator.getSessions().get(0));
+        Session.sendToTarget(qr, initiator.getSessions().get(0));
     }
-
 }

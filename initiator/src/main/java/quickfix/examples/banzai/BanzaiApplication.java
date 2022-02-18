@@ -32,7 +32,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class BanzaiApplication extends MessageCracker implements Application {
-    private Logger log= LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
     private final DefaultMessageFactory messageFactory = new DefaultMessageFactory();
     private OrderTableModel orderTableModel = null;
     private ExecutionTableModel executionTableModel = null;
@@ -47,7 +47,7 @@ public class BanzaiApplication extends MessageCracker implements Application {
     static private final HashMap<SessionID, HashSet<ExecID>> execIDs = new HashMap<>();
 
     public BanzaiApplication(OrderTableModel orderTableModel,
-            ExecutionTableModel executionTableModel) {
+                             ExecutionTableModel executionTableModel) {
         this.orderTableModel = orderTableModel;
         this.executionTableModel = executionTableModel;
     }
@@ -67,9 +67,10 @@ public class BanzaiApplication extends MessageCracker implements Application {
         Session.lookupSession(sessionID).setTargetDefaultApplicationVersionID(new ApplVerID("8"));
         try {
             String msgType = message.getHeader().getString(MsgType.FIELD);
-            if(MsgType.LOGON.compareTo(msgType) == 0){
+            if (MsgType.LOGON.compareTo(msgType) == 0) {
                 message.setString(Username.FIELD, "user");
                 message.setString(Password.FIELD, "pass");
+//                message.setString(PartyID.FIELD,"PDP_TRADE");
             }
         } catch (FieldNotFound e) {
             e.printStackTrace();
@@ -97,7 +98,7 @@ public class BanzaiApplication extends MessageCracker implements Application {
 
     @Override
     protected void onMessage(Message message, SessionID sessionID) throws FieldNotFound, UnsupportedMessageType, IncorrectTagValue {
-        log.info("message:"+message);
+        log.info("message:" + message);
     }
 
     public class MessageProcessor implements Runnable {
@@ -379,8 +380,8 @@ public class BanzaiApplication extends MessageCracker implements Application {
         String id = order.generateID();
         quickfix.fix40.OrderCancelRequest message = new quickfix.fix40.OrderCancelRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(id), new CxlType(CxlType.FULL_REMAINING_QUANTITY), new Symbol(order
-                        .getSymbol()), sideToFIXSide(order.getSide()), new OrderQty(order
-                        .getQuantity()));
+                .getSymbol()), sideToFIXSide(order.getSide()), new OrderQty(order
+                .getQuantity()));
 
         orderTableModel.addID(order, id);
         send(message, order.getSessionID());
@@ -427,7 +428,7 @@ public class BanzaiApplication extends MessageCracker implements Application {
         quickfix.fix40.OrderCancelReplaceRequest message = new quickfix.fix40.OrderCancelReplaceRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(newOrder.getID()), new HandlInst('1'),
                 new Symbol(order.getSymbol()), sideToFIXSide(order.getSide()), new OrderQty(
-                        newOrder.getQuantity()), typeToFIXType(order.getType()));
+                newOrder.getQuantity()), typeToFIXType(order.getType()));
 
         orderTableModel.addID(order, newOrder.getID());
         send(populateCancelReplace(order, newOrder, message), order.getSessionID());
@@ -437,7 +438,7 @@ public class BanzaiApplication extends MessageCracker implements Application {
         quickfix.fix41.OrderCancelReplaceRequest message = new quickfix.fix41.OrderCancelReplaceRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(newOrder.getID()), new HandlInst('1'),
                 new Symbol(order.getSymbol()), sideToFIXSide(order.getSide()), typeToFIXType(order
-                        .getType()));
+                .getType()));
 
         orderTableModel.addID(order, newOrder.getID());
         send(populateCancelReplace(order, newOrder, message), order.getSessionID());
