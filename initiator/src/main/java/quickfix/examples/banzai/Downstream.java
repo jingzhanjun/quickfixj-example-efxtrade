@@ -158,7 +158,7 @@ public class Downstream {
                     nos.setAccount(clientId);
                     nos.setIssuer(userId);
                     nos.setQuoteRespID(orderId);
-                    nos.setQuoteMsgID("GenIdeal");
+                    nos.setQuoteMsgID(args[17]);
                     nos.setSpread(Double.valueOf(args[12]));
                     nos.setTradeDate(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     nos.setSettlType(settlType);
